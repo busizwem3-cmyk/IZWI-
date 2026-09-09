@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101418"><link rel="manifest" href="manifest.webmanifest">
+<title>IZWI — Zakhele</title>
+<style>
+body{margin:0;background:#0d1117;color:#f4f7fa;font-family:system-ui,sans-serif}main{max-width:850px;margin:auto;padding:18px}
+.card{background:#151b23;border:1px solid #303b47;border-radius:18px;padding:16px;margin:12px 0}
+h1{font-size:38px;margin:8px 0}.muted{color:#aab5c0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+button{min-height:44px;padding:11px 14px;border:0;border-radius:12px;background:#d7ff45;color:#101418;font-weight:800;margin:4px;cursor:pointer}
+.dark{background:#202a34;color:#fff;border:1px solid #3a4753}.log{background:#090d12;border-radius:14px;padding:12px;min-height:90px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}h1{font-size:31px}}
+.musicGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.musicBtn{background:#202a34;color:#fff;border:1px solid #3a4753}.musicBtn.active{background:#d7ff45;color:#101418}@media(max-width:600px){.musicGrid{grid-template-columns:1fr}}</style></head><body><main>
+<div class="muted">IZWI • eMhlabeni • Saturday</div>
+<h1>Welcome home, Zakhele.</h1>
+<p class="muted">First playable PWA prototype of the fictional Zulu open-world game.</p>
+<div class="card"><button id="start">Start Day</button><button class="dark" id="save">Save Progress</button></div>
+<div class="grid"><div class="card"><b>📍 Location</b><h2 id="loc">Zakhele's House</h2><span class="muted" id="time">08:00</span></div>
+<div class="card"><b>⭐ Story Progress</b><h2><span id="xp">0</span> XP</h2></div></div>
+<div class="card"><b>🌆 Explore eMhlabeni</b><div>
+<button data-p="Barbershop">💈 Barber</button><button data-p="Gym">🏋🏾 Gym</button>
+<button data-p="Cinema">🎬 Cinema</button><button data-p="Restaurant">🍽️ Restaurant</button>
+<button data-p="Taxi Rank">🚕 Taxi Rank</button><button data-p="Custom Garage">🔧 Garage</button>
+<button data-p="Club">🕺🏾 Club</button><button data-p="Jewelry Store">💎 Jewelry</button>
+<button data-p="City Centre">🏙️ City Centre</button></div></div>
+
+<div class="card"><b>🎵 IZWI Theme Music</b>
+<p class="muted">Original in-game themes. These are placeholders for the licensed/commissioned songs we'll add later.</p>
+<div class="musicGrid">
+<button class="musicBtn" data-theme="uMhlaba">🎤 uMhlaba<br><small>Hip-hop inspired</small></button>
+<button class="musicBtn" data-theme="Amanzi">🪘 Amanzi Nights<br><small>Amapiano inspired</small></button>
+<button class="musicBtn" data-theme="eMhlabeni">🎬 eMhlabeni<br><small>Cinematic</small></button>
+</div>
+<p><button class="dark" id="stopMusic">⏹ Stop Theme</button></p>
+<div class="muted" id="musicStatus">No theme playing.</div></div>
+
+<div class="card"><b>📱 Phone</b><p><button class="dark" id="call">Call Kumbi</button><button class="dark" id="radio">Radio</button><button class="dark" id="home">Go Home</button></p>
+<div class="log" id="dialogue"><b>Kumbi:</b> “Sawubona mfowethu. Sekunesikhathi ungiboni.”<br><br><b>Zakhele:</b> “Ngisanda kufika. Ngisazama ukujwayela futhi.”</div></div>
+<div class="card"><b>🎯 First Quest</b><p class="muted" id="quest">Get settled in eMhlabeni and visit Kumbi.</p>
+<button id="q">Visit Kumbi • +25 XP</button></div>
+<p class="muted" style="text-align:center;font-size:12px">Offline-first prototype • GitHub Pages ready</p>
+</main>
+<script src="theme_music.js"></script><script>
+const K="izwi-v1";let s=JSON.parse(localStorage.getItem(K)||'{"xp":0,"loc":"Zakhele\'s House","hour":8,"done":false}');
+const $=x=>document.getElementById(x),save=()=>localStorage.setItem(K,JSON.stringify(s));
+function render(){$("xp").textContent=s.xp;$("loc").textContent=s.loc;$("time").textContent=String(s.hour).padStart(2,"0")+":00";$("quest").textContent=s.done?"Quest complete.":"Get settled in eMhlabeni and visit Kumbi.";$("q").textContent=s.done?"Quest Complete":"Visit Kumbi • +25 XP";}
+function msg(t){$("dialogue").innerHTML=t}
+$("start").onclick=()=>{if(!IZWIThemeMusic.current()) IZWIThemeMusic.play("eMhlabeni");s.hour=Math.min(23,s.hour+1);save();render();msg("<b>Zakhele:</b> “Kulungile. Masiqale usuku.”")};
+$("save").onclick=()=>{save();msg("<b>System:</b> Progress saved.")};
+$("call").onclick=()=>msg("<b>Kumbi:</b> “Uphi wena? Woza ungibone.”<br><br><b>Zakhele:</b> “Ngiyayeza.”");
+$("radio").onclick=()=>msg("<b>eMhlabeni FM:</b> “Sawubona, eMhlabeni! Nansi ingoma elandelayo...”");
+$("home").onclick=()=>{s.loc="Zakhele's House";save();render();msg("<b>Zakhele:</b> “Kwesinye isikhathi akukho ndawo efana nasekhaya.”")};
+$("q").onclick=()=>{if(!s.done){s.done=true;s.xp+=25;s.loc="Kumbi's Neighborhood";save();render();msg("<b>Kumbi:</b> “Ekugcineni! Bengithi usukhohliwe ngami.”<br><br><b>Zakhele:</b> “Angikhohlwanga.”")}};
+
+document.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>{
+  IZWIThemeMusic.play(b.dataset.theme);
+  document.querySelectorAll("[data-theme]").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  $("musicStatus").textContent="Playing: "+IZWIThemeMusic.tracks[b.dataset.theme].name+" — "+IZWIThemeMusic.tracks[b.dataset.theme].style;
+});
+$("stopMusic").onclick=()=>{
+  IZWIThemeMusic.stop();
+  document.querySelectorAll("[data-theme]").forEach(x=>x.classList.remove("active"));
+  $("musicStatus").textContent="Theme stopped.";
+};
+
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{s.loc=b.dataset.p;s.hour=Math.min(23,s.hour+1);save();render();let p=b.dataset.p;msg("<b>NPC:</b> “Sawubona, Zakhele.”<br><br><b>Zakhele:</b> “Yebo, sawubona.”<br><br><span class='muted'>"+p+" • contextual prototype dialogue</span>")});render();
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script></body></html>
